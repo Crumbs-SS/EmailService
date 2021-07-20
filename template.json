@@ -1,7 +1,0 @@
-{
-  "Template": {
-    "TemplateName": "EmailConfirmationTemplate",
-    "SubjectPart": "Greetings, {{name}}!",
-    "HtmlPart": "<h1>Dear {{name}},</h1><p>We are glad that you want to join Crumbs Food Service. Please click this link to confirm your e-mail: {{link}}.</p>"
-  }
-}

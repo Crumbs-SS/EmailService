@@ -1,6 +1,6 @@
 package com.example.crumbs.EmailService.Controller;
 
-import com.example.crumbs.EmailService.EmailService;
+import com.example.crumbs.EmailService.Service.EmailService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -11,19 +11,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @AllArgsConstructor
 @CrossOrigin(origins = "*", allowedHeaders = "*")
-public class Controller {
+public class MainController {
 
     @Autowired
     private EmailService emailService;
 
-    @GetMapping("/confirmToken/{token}")
+    @GetMapping("/email/token/{token}")
     public String confirmToken(@PathVariable String token){
             return emailService.confirmToken(token);
     }
 
     @GetMapping("/email/{email}/name/{name}/token/{token}")
-    public String sendEmail(@PathVariable String email, @PathVariable String name, @PathVariable String token) {
-        return emailService.sendEmail(email, name, token);
+    public void sendConfirmationEmail(@PathVariable String email, @PathVariable String name, @PathVariable String token) {
+        emailService.sendConfirmationEmail(email, name, token);
     }
 
 }

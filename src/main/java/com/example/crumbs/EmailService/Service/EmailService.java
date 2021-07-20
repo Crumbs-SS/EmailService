@@ -1,4 +1,4 @@
-package com.example.crumbs.EmailService;
+package com.example.crumbs.EmailService.Service;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -12,12 +12,15 @@ import com.crumbs.lib.entity.UserStatus;
 import com.crumbs.lib.repository.ConfirmationTokenRepository;
 import com.crumbs.lib.repository.UserStatusRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @Transactional(rollbackFor = { Exception.class })
@@ -32,20 +35,20 @@ public class EmailService {
         this.userStatusRepository = userStatusRepository;
     }
 
+    private final String accessKey = "AKIAYT66KQD633E5VUSJ";
+    private final String secretKey = "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";
+    private final String region = "us-east-2";
+    public final String from = "crumbsFoodService@gmail.com";
 
-    private String accessKey = "AKIAYT66KQD633E5VUSJ";
+    //    When on group EC2 instance -> configure environment variables:
+//    private final String accessKey = ${ACCESS_KEY};
+//    private final String secretKey = ${SECRET_KEY};
+//    private final String region = ${REGION};
+//    public final String from = ${CRUMBS_EMAIL};
 
-    private String secretKey = "pLs78Ti0kAWZjejNYv6ViAPCq6VOxbXQplTK/FWo";
+    private String emailConfirmationTemplate = "EmailConfirmationTemplate";
 
-    private String region = "us-east-2";
-
-    public String from = "crumbsFoodService@gmail.com";
-    //public String[] to = {"crumbsCustomer@gmail.com"};
-    private String templateName = "EmailConfirmationTemplate";
-    private String templateData;
-
-
-    public String sendEmail(String email, String name, String token) {
+    public void sendConfirmationEmail(String email, String name, String token) {
 
         AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
         com.amazonaws.services.simpleemail.AmazonSimpleEmailService client = AmazonSimpleEmailServiceClientBuilder
@@ -55,36 +58,33 @@ public class EmailService {
         List<String> toAddresses = new ArrayList<String>();
         toAddresses.add(email);
 
-
         destination.setToAddresses(toAddresses);
         SendTemplatedEmailRequest templatedEmailRequest = new SendTemplatedEmailRequest();
         templatedEmailRequest.withDestination(destination);
-        templatedEmailRequest.withTemplate(templateName);
+        templatedEmailRequest.withTemplate(emailConfirmationTemplate);
 
         String link = "http://localhost:3000/email/verification/" + token;
 
-        templateData = "{ \"name\":\"" + name + "\", \"link\": \""+ link + "\"}";
+        String templateData = "{ \"name\":\"" + name + "\", \"link\": \""+ link + "\"}";
 
         templatedEmailRequest.withTemplateData(templateData);
         templatedEmailRequest.withSource(from);
         client.sendTemplatedEmail(templatedEmailRequest);
-        return "email sent";
     }
 
     public String confirmToken(String token) {
-        ConfirmationToken confirmationToken = confirmationTokenRepository
-                .findByToken(token)
-                .orElseThrow(() ->
-                        new IllegalStateException("token not found"));
+
+        ConfirmationToken confirmationToken = confirmationTokenRepository.findByToken(token).orElseThrow(()-> new NoSuchElementException("Invalid token"));
 
         if (confirmationToken.getConfirmed_at() != null) {
-            throw new IllegalStateException("email already confirmed");
+            return ("Your email is already confirmed! Login to Crumbs Food Service to place your first order!");
         }
 
         LocalDateTime expiredAt = confirmationToken.getExpiresAt();
 
         if (expiredAt.isBefore(LocalDateTime.now())) {
-            throw new IllegalStateException("token expired");
+            confirmationTokenRepository.delete(confirmationToken);
+            return ("Your token has expired. Please try signing up again and remember to confirm your email under 15 minutes.");
         }
 
         confirmationTokenRepository.updateConfirmedAt(token, LocalDateTime.now());
@@ -102,7 +102,7 @@ public class EmailService {
         if(user.getDriver() != null)
             user.getDriver().setUserStatus(status);
 
-        return "confirmed";
+        return "Your email has successfully been confirmed. You can now login to Crumbs Food Service and start ordering delicious food!";
     }
 
 
