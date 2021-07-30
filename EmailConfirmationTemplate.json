@@ -1,9 +1,7 @@
 {
   "Template": {
-    "TemplateName": "EmailConfirmationTemplate",
-    "SubjectPart": "Greetings, {{name}}!",
-    "HtmlPart": "<h1>Dear {{name}},</h1><p>We are glad that you want to join Crumbs Food Service. Please click this link to confirm your e-mail: {{link}}.</p>",
-
-
+    "TemplateName": "OrderDetailsTemplate",
+    "SubjectPart": "Order Placed!",
+    "HtmlPart": "<h1>{{restaurantName}}</h1><p>{{restaurantAddress}}</p><br><p>Customer Name: {{customerName}}</p><p>Customer Email: {{customerEmail}}</p><p>Customer Address: {{customerAddress}}</p><p>Customer Contact Number: {{customerPhone}}</p><br><h1>Delivery</h1><p>Order #: {{orderId}}</p><p>Special Instructions: {{specialInstructions}} </p><p>Ordered at {{orderCreatedAt}}</p>{{orderContents}}<br><br><p>Happy Eating! Thank you for ordering online with us.</p><br><br>"
   }
 }
