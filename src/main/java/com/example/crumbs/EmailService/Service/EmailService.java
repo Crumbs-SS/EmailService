@@ -3,20 +3,29 @@ package com.example.crumbs.EmailService.Service;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.services.simpleemail.AmazonSimpleEmailService;
 import com.amazonaws.services.simpleemail.AmazonSimpleEmailServiceClientBuilder;
 import com.amazonaws.services.simpleemail.model.Destination;
 import com.amazonaws.services.simpleemail.model.SendTemplatedEmailRequest;
 import com.crumbs.lib.entity.ConfirmationToken;
+import com.crumbs.lib.entity.Order;
 import com.crumbs.lib.entity.UserDetails;
 import com.crumbs.lib.entity.UserStatus;
 import com.crumbs.lib.repository.ConfirmationTokenRepository;
+import com.crumbs.lib.repository.OrderRepository;
 import com.crumbs.lib.repository.UserStatusRepository;
+import com.example.crumbs.EmailService.mapper.TemplateData;
+import com.example.crumbs.EmailService.mapper.TemplateDataMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,17 +37,29 @@ public class EmailService {
 
     private final ConfirmationTokenRepository confirmationTokenRepository;
     private final UserStatusRepository userStatusRepository;
+    private final OrderRepository orderRepository;
 
-    @Autowired
-    public EmailService(ConfirmationTokenRepository confirmationTokenRepository, UserStatusRepository userStatusRepository){
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final String secretKey = "A5msrtaTiM/TOhZPJMf0JDLP0Dw5UcVlUrBZ23e9";
+    private final String accessKey = "AKIA2THHWIVRZSIFDHIE";
+    private final String region = "us-east-1";
+    private final AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+    private final AmazonSimpleEmailService client = AmazonSimpleEmailServiceClientBuilder
+            .standard().withCredentials(new AWSStaticCredentialsProvider(credentials)).withRegion(region).build();
+
+    public final String from = "crumbsFoodService@gmail.com";
+
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+    public EmailService(
+            ConfirmationTokenRepository confirmationTokenRepository,
+            UserStatusRepository userStatusRepository,
+            OrderRepository orderRepository
+            ){
         this.confirmationTokenRepository =  confirmationTokenRepository;
         this.userStatusRepository = userStatusRepository;
+        this.orderRepository = orderRepository;
     }
 
-    private final String accessKey = "AKIAYT66KQD633E5VUSJ";
-    private final String secretKey = "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";
-    private final String region = "us-east-2";
-    public final String from = "crumbsFoodService@gmail.com";
 
     //    When on group EC2 instance -> configure environment variables:
 //    private final String accessKey = ${ACCESS_KEY};
@@ -46,13 +67,7 @@ public class EmailService {
 //    private final String region = ${REGION};
 //    public final String from = ${CRUMBS_EMAIL};
 
-    private String emailConfirmationTemplate = "EmailConfirmationTemplate";
-
     public void sendConfirmationEmail(String email, String name, String token) {
-
-        AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
-        com.amazonaws.services.simpleemail.AmazonSimpleEmailService client = AmazonSimpleEmailServiceClientBuilder
-                .standard().withCredentials(new AWSStaticCredentialsProvider(credentials)).withRegion(region).build();
 
         Destination destination = new Destination();
         List<String> toAddresses = new ArrayList<String>();
@@ -61,6 +76,7 @@ public class EmailService {
         destination.setToAddresses(toAddresses);
         SendTemplatedEmailRequest templatedEmailRequest = new SendTemplatedEmailRequest();
         templatedEmailRequest.withDestination(destination);
+        String emailConfirmationTemplate = "EmailConfirmationTemplate";
         templatedEmailRequest.withTemplate(emailConfirmationTemplate);
 
         String link = "http://localhost:3000/email/verification/" + token;
@@ -68,6 +84,24 @@ public class EmailService {
         String templateData = "{ \"name\":\"" + name + "\", \"link\": \""+ link + "\"}";
 
         templatedEmailRequest.withTemplateData(templateData);
+        templatedEmailRequest.withSource(from);
+        client.sendTemplatedEmail(templatedEmailRequest);
+    }
+
+    public void sendOrderDetails(Long orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow();
+        UserDetails customer = order.getCustomer().getUserDetails();
+        String email = customer.getEmail();
+        String emailConfirmationTemplate = "OrderDetailsTemplate";
+        TemplateData templateData = TemplateDataMapper.orderToTemplateData(order);
+
+        Destination destination = new Destination(List.of(email));
+        SendTemplatedEmailRequest templatedEmailRequest = new SendTemplatedEmailRequest();
+        templatedEmailRequest.withDestination(destination);
+        templatedEmailRequest.withTemplate(emailConfirmationTemplate);
+        try {
+            templatedEmailRequest.withTemplateData(objectMapper.writeValueAsString(templateData));
+        } catch (JsonProcessingException e) { }
         templatedEmailRequest.withSource(from);
         client.sendTemplatedEmail(templatedEmailRequest);
     }
@@ -104,6 +138,4 @@ public class EmailService {
 
         return "Your email has successfully been confirmed. You can now login to Crumbs Food Service and start ordering delicious food!";
     }
-
-
 }

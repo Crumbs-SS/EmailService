@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -19,7 +20,7 @@ public class MainControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-    @Autowired
+    @MockBean
     private EmailService emailService;
 
     @Test
@@ -40,5 +41,10 @@ public class MainControllerTest {
     }
 
 
-
+    @Test
+    public void sendOrderDetails() throws Exception {
+        mockMvc.perform(post("/email/orders/{id}/details", -1)
+        .contentType("application/json"))
+                .andExpect(status().isNoContent());
+    }
 }
