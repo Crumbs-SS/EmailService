@@ -28,7 +28,7 @@ public class TemplateDataMapper {
                 .build();
     }
 
-    private static String getAddress(Location location){
+    public static String getAddress(Location location){
         return location.getStreet() + ", "
                 + location.getCity() + ", "
                 + location.getState() + " "
