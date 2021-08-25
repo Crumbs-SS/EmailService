@@ -25,6 +25,11 @@ public class MainController {
         emailService.sendConfirmationEmail(email, name, token);
     }
 
+    @GetMapping("/email/{email}/token/{token}")
+    public void sendPasswordRecoveryEmail(@PathVariable String email, @PathVariable String token) {
+        emailService.sendPasswordRecoveryEmail(email, token);
+    }
+
     @PostMapping("/email/orders/{id}/details")
     public ResponseEntity<Object> sendOrderDetails(@PathVariable Long id){
         emailService.sendOrderDetails(id);
