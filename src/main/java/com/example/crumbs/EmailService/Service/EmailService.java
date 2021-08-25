@@ -83,6 +83,26 @@ public class EmailService {
         client.sendTemplatedEmail(templatedEmailRequest);
     }
 
+    public void sendPasswordRecoveryEmail(String email, String token) {
+        Destination destination = new Destination();
+        List<String> toAddresses = new ArrayList<String>();
+        toAddresses.add(email);
+
+        destination.setToAddresses(toAddresses);
+        SendTemplatedEmailRequest templatedEmailRequest = new SendTemplatedEmailRequest();
+        templatedEmailRequest.withDestination(destination);
+        String passwordRecoveryTemplate = "passwordRecoveryTemplate";
+        templatedEmailRequest.withTemplate(passwordRecoveryTemplate);
+
+        String link = "http://localhost:3000/passwordRecovery/" + token;
+
+        String templateData = "{\"link\": \""+ link + "\"}";
+
+        templatedEmailRequest.withTemplateData(templateData);
+        templatedEmailRequest.withSource(from);
+        client.sendTemplatedEmail(templatedEmailRequest);
+    }
+
     public void sendOrderDetails(Long orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow();
         UserDetails customer = order.getCustomer().getUserDetails();
