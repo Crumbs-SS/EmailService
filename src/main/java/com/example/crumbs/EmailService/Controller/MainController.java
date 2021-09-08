@@ -23,19 +23,19 @@ public class MainController {
         this.snsService = snsService;
     }
     @PreAuthorize("hasAuthority('CUSTOMER')")
-    @GetMapping("/email/token/{token}")
+    @PutMapping("/email/token/{token}")
     public String confirmToken(@PathVariable String token){
             return emailService.confirmToken(token);
     }
 
     @PreAuthorize("hasAuthority('CUSTOMER') and #username == authentication.principal")
-    @GetMapping("/email/confirmation/{username}")
+    @PostMapping("/email/confirmation/{username}")
     public void sendConfirmationEmail(@PathVariable String username, @Validated @RequestBody EmailDTO emailDTO) {
         emailService.sendConfirmationEmail(emailDTO);
     }
 
     @PreAuthorize("hasAuthority('CUSTOMER') and #username == authentication.principal")
-    @GetMapping("/email/password/{username}")
+    @PostMapping("/email/password/{username}")
     public void sendPasswordRecoveryEmail(@PathVariable String username, @Validated @RequestBody EmailDTO emailDTO) {
         emailService.sendPasswordRecoveryEmail(emailDTO);
     }
