@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -14,7 +15,7 @@ import javax.validation.constraints.NotNull;
 @Builder
 public class EmailDTO {
     @NotNull
-    @NotEmpty
+    @Email
     private String email;
     @NotNull
     @NotEmpty
