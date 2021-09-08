@@ -14,6 +14,7 @@ import com.crumbs.lib.entity.UserStatus;
 import com.crumbs.lib.repository.ConfirmationTokenRepository;
 import com.crumbs.lib.repository.OrderRepository;
 import com.crumbs.lib.repository.UserStatusRepository;
+import com.example.crumbs.EmailService.dto.EmailDTO;
 import com.example.crumbs.EmailService.mapper.TemplateData;
 import com.example.crumbs.EmailService.mapper.TemplateDataMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -62,11 +63,11 @@ public class EmailService {
 //    private final String region = ${REGION};
 //    public final String from = ${CRUMBS_EMAIL};
 
-    public void sendConfirmationEmail(String email, String name, String token) {
+    public void sendConfirmationEmail(EmailDTO emailDTO) {
 
         Destination destination = new Destination();
         List<String> toAddresses = new ArrayList<String>();
-        toAddresses.add(email);
+        toAddresses.add(emailDTO.getEmail());
 
         destination.setToAddresses(toAddresses);
         SendTemplatedEmailRequest templatedEmailRequest = new SendTemplatedEmailRequest();
@@ -74,19 +75,19 @@ public class EmailService {
         String emailConfirmationTemplate = "EmailConfirmationTemplate";
         templatedEmailRequest.withTemplate(emailConfirmationTemplate);
 
-        String link = "http://localhost:3000/email/verification/" + token;
+        String link = "http://localhost:3000/email/verification/" + emailDTO.getToken();
 
-        String templateData = "{ \"name\":\"" + name + "\", \"link\": \""+ link + "\"}";
+        String templateData = "{ \"name\":\"" + emailDTO.getName() + "\", \"link\": \""+ link + "\"}";
 
         templatedEmailRequest.withTemplateData(templateData);
         templatedEmailRequest.withSource(from);
         client.sendTemplatedEmail(templatedEmailRequest);
     }
 
-    public void sendPasswordRecoveryEmail(String email, String token) {
+    public void sendPasswordRecoveryEmail(EmailDTO emailDTO) {
         Destination destination = new Destination();
         List<String> toAddresses = new ArrayList<String>();
-        toAddresses.add(email);
+        toAddresses.add(emailDTO.getEmail());
 
         destination.setToAddresses(toAddresses);
         SendTemplatedEmailRequest templatedEmailRequest = new SendTemplatedEmailRequest();
@@ -94,7 +95,7 @@ public class EmailService {
         String passwordRecoveryTemplate = "passwordRecoveryTemplate";
         templatedEmailRequest.withTemplate(passwordRecoveryTemplate);
 
-        String link = "http://localhost:3000/passwordRecovery/" + token;
+        String link = "http://localhost:3000/passwordRecovery/" + emailDTO.getToken();
 
         String templateData = "{\"link\": \""+ link + "\"}";
 

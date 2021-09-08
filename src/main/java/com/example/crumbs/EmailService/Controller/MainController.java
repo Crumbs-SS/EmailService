@@ -2,10 +2,13 @@ package com.example.crumbs.EmailService.Controller;
 
 import com.example.crumbs.EmailService.Service.EmailService;
 import com.example.crumbs.EmailService.Service.SNSService;
+import com.example.crumbs.EmailService.dto.EmailDTO;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,29 +22,33 @@ public class MainController {
         this.emailService = emailService;
         this.snsService = snsService;
     }
-
-    @GetMapping("/email/token/{token}")
+    @PreAuthorize("hasAuthority('CUSTOMER')")
+    @PutMapping("/email/token/{token}")
     public String confirmToken(@PathVariable String token){
             return emailService.confirmToken(token);
     }
 
-    @GetMapping("/email/{email}/name/{name}/token/{token}")
-    public void sendConfirmationEmail(@PathVariable String email, @PathVariable String name, @PathVariable String token) {
-        emailService.sendConfirmationEmail(email, name, token);
+    @PreAuthorize("hasAuthority('CUSTOMER') and #username == authentication.principal")
+    @PostMapping("/email/confirmation/{username}")
+    public void sendConfirmationEmail(@PathVariable String username, @Validated @RequestBody EmailDTO emailDTO) {
+        emailService.sendConfirmationEmail(emailDTO);
     }
 
-    @GetMapping("/email/{email}/token/{token}")
-    public void sendPasswordRecoveryEmail(@PathVariable String email, @PathVariable String token) {
-        emailService.sendPasswordRecoveryEmail(email, token);
+    @PreAuthorize("hasAuthority('CUSTOMER') and #username == authentication.principal")
+    @PostMapping("/email/password/{username}")
+    public void sendPasswordRecoveryEmail(@PathVariable String username, @Validated @RequestBody EmailDTO emailDTO) {
+        emailService.sendPasswordRecoveryEmail(emailDTO);
     }
 
-    @PostMapping("/email/orders/{id}/details")
-    public ResponseEntity<Object> sendOrderDetails(@PathVariable Long id){
+    @PreAuthorize("hasAuthority('CUSTOMER') and #username == authentication.principal")
+    @PostMapping("/email/{username}/orders/{id}/details")
+    public ResponseEntity<Object> sendOrderDetails(@PathVariable String username, @PathVariable Long id){
         emailService.sendOrderDetails(id);
         snsService.sendOrderDetailsToPhoneNumber(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/orders/{orderId}/drivers/{driverId}")
     public ResponseEntity<Object> sendOrderRequestToDriver(@PathVariable Long orderId, @PathVariable Long driverId){
         snsService.sendOrderRequestToDriverPhone(driverId, orderId);
