@@ -31,8 +31,7 @@ public class TemplateDataMapper {
     public static String getAddress(Location location){
         return location.getStreet() + ", "
                 + location.getCity() + ", "
-                + location.getState() + " "
-                + location.getZipCode();
+                + location.getState() + " ";
     }
 
     private static String getFullName(Order order){
