@@ -41,8 +41,12 @@ public class MainController {
     }
 
     @PreAuthorize("hasAuthority('CUSTOMER') and #username == authentication.principal")
-    @PostMapping("/email/{username}/orders/{id}/details")
-    public ResponseEntity<Object> sendOrderDetails(@PathVariable String username, @PathVariable Long id){
+    @PostMapping("/email/orders/{id}/details")
+    public ResponseEntity<Object> sendOrderDetails(
+            @RequestHeader("Username") String username,
+            @PathVariable Long id
+    ){
+        System.out.println("Hello World");
         emailService.sendOrderDetails(id);
         snsService.sendOrderDetailsToPhoneNumber(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

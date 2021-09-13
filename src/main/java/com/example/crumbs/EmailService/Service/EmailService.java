@@ -108,16 +108,14 @@ public class EmailService {
         Order order = orderRepository.findById(orderId).orElseThrow();
         UserDetails customer = order.getCustomer().getUserDetails();
         String email = customer.getEmail();
-        String emailConfirmationTemplate = "OrderDetailsTemplate";
         TemplateData templateData = TemplateDataMapper.orderToTemplateData(order);
-
         Destination destination = new Destination(List.of(email));
         SendTemplatedEmailRequest templatedEmailRequest = new SendTemplatedEmailRequest();
         templatedEmailRequest.withDestination(destination);
-        templatedEmailRequest.withTemplate(emailConfirmationTemplate);
+        templatedEmailRequest.withTemplate("OrderDetailsTemplate");
         try {
             templatedEmailRequest.withTemplateData(objectMapper.writeValueAsString(templateData));
-        } catch (JsonProcessingException ignored) { }
+        } catch (JsonProcessingException ignored) {}
         templatedEmailRequest.withSource(from);
         client.sendTemplatedEmail(templatedEmailRequest);
     }
