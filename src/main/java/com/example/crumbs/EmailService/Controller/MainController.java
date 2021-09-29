@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
+@RequestMapping("/email-service")
 public class MainController {
 
     private final EmailService emailService;
@@ -23,25 +24,25 @@ public class MainController {
         this.snsService = snsService;
     }
     @PreAuthorize("hasAuthority('CUSTOMER')")
-    @PutMapping("/email/token/{token}")
+    @PutMapping("/token/{token}")
     public String confirmToken(@PathVariable String token){
             return emailService.confirmToken(token);
     }
 
     @PreAuthorize("hasAuthority('CUSTOMER') and #username == authentication.principal")
-    @PostMapping("/email/confirmation/{username}")
+    @PostMapping("/confirmation/{username}")
     public void sendConfirmationEmail(@PathVariable String username, @Validated @RequestBody EmailDTO emailDTO) {
         emailService.sendConfirmationEmail(emailDTO);
     }
 
     @PreAuthorize("hasAuthority('CUSTOMER') and #username == authentication.principal")
-    @PostMapping("/email/password/{username}")
+    @PostMapping("/password/{username}")
     public void sendPasswordRecoveryEmail(@PathVariable String username, @Validated @RequestBody EmailDTO emailDTO) {
         emailService.sendPasswordRecoveryEmail(emailDTO);
     }
 
     @PreAuthorize("hasAuthority('CUSTOMER') and #username == authentication.principal")
-    @PostMapping("/email/orders/{id}/details")
+    @PostMapping("/orders/{id}/details")
     public ResponseEntity<Object> sendOrderDetails(
             @RequestHeader("Username") String username,
             @PathVariable Long id
