@@ -15,6 +15,7 @@
 	<description>Email Service for Crumbs</description>
 	<properties>
 		<java.version>16</java.version>
+		<sonar.projectKey>email-service</sonar.projectKey>
 	</properties>
 	<dependencies>
 		<dependency>
