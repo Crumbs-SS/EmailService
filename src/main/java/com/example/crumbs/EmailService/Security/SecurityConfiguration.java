@@ -27,7 +27,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.addFilter(new JwtAuthorizationFilter(authenticationManager(), jwtSecret))
                 .authorizeRequests()
-                .antMatchers( "/actuator/**").permitAll()
+                .antMatchers( "/actuator/**", "/email-service/confirmation/**").permitAll()
                 .anyRequest().authenticated()
                 .and().httpBasic()
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)

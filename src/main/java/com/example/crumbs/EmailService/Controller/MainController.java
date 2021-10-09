@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RequestMapping("/email-service")
+@PreAuthorize("isAuthenticated()")
 public class MainController {
 
     private final EmailService emailService;
@@ -23,13 +24,13 @@ public class MainController {
         this.emailService = emailService;
         this.snsService = snsService;
     }
-    @PreAuthorize("hasAuthority('CUSTOMER')")
-    @PutMapping("/token/{token}")
+    @PreAuthorize("permitAll()")
+    @PutMapping("/confirmation/token/{token}")
     public String confirmToken(@PathVariable String token){
             return emailService.confirmToken(token);
     }
 
-    @PreAuthorize("hasAuthority('CUSTOMER') and #username == authentication.principal")
+    @PreAuthorize("permitAll()")
     @PostMapping("/confirmation/{username}")
     public void sendConfirmationEmail(@PathVariable String username, @Validated @RequestBody EmailDTO emailDTO) {
         emailService.sendConfirmationEmail(emailDTO);
