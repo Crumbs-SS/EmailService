@@ -1,4 +1,4 @@
-package com.example.crumbs.EmailService.Security;
+package com.example.crumbs.EmailService.security;
 
 import com.crumbs.AuthLib.security.JwtAuthorizationFilter;
 import org.springframework.beans.factory.annotation.Value;

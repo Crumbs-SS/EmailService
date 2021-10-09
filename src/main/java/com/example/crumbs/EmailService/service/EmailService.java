@@ -1,4 +1,4 @@
-package com.example.crumbs.EmailService.Service;
+package com.example.crumbs.EmailService.service;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;

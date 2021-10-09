@@ -1,4 +1,4 @@
-package com.example.crumbs.EmailService.Service;
+package com.example.crumbs.EmailService.service;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.NumberFormat;
-import java.util.HashMap;
 import java.util.Locale;
 
 @Service

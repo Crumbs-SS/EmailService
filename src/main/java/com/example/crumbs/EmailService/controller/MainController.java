@@ -1,10 +1,8 @@
-package com.example.crumbs.EmailService.Controller;
+package com.example.crumbs.EmailService.controller;
 
-import com.example.crumbs.EmailService.Service.EmailService;
-import com.example.crumbs.EmailService.Service.SNSService;
+import com.example.crumbs.EmailService.service.EmailService;
+import com.example.crumbs.EmailService.service.SNSService;
 import com.example.crumbs.EmailService.dto.EmailDTO;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -48,7 +46,6 @@ public class MainController {
             @RequestHeader("Username") String username,
             @PathVariable Long id
     ){
-        System.out.println("Hello World");
         emailService.sendOrderDetails(id);
         snsService.sendOrderDetailsToPhoneNumber(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
