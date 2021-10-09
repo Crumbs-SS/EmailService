@@ -36,8 +36,8 @@ public class EmailService {
     private final OrderRepository orderRepository;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final String secretKey = "A5msrtaTiM/TOhZPJMf0JDLP0Dw5UcVlUrBZ23e9";
-    private final String accessKey = "AKIA2THHWIVRZSIFDHIE";
+    private final String secretKey = "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";
+    private final String accessKey = "AKIA2THHWIVRS3TOZHEO";
     private final String region = "us-east-1";
     private final AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
     private final AmazonSimpleEmailService client = AmazonSimpleEmailServiceClientBuilder
