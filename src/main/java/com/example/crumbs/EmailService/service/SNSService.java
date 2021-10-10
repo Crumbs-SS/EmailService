@@ -26,8 +26,8 @@ public class SNSService {
     private final AmazonSNS snsClient;
 
     {
-        final String secretKey = "A5msrtaTiM/TOhZPJMf0JDLP0Dw5UcVlUrBZ23e9";
-        final String accessKey = "AKIA2THHWIVRZSIFDHIE";
+        final String secretKey = System.getenv("AWS_SECRET_ACCESS_KEY");
+        final String accessKey = System.getenv("AWS_ACCESS_KEY_ID");
         final BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
         final AWSStaticCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(credentials);
         snsClient = AmazonSNSClientBuilder

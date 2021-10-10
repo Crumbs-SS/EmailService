@@ -34,16 +34,14 @@ public class EmailService {
     private final ConfirmationTokenRepository confirmationTokenRepository;
     private final UserStatusRepository userStatusRepository;
     private final OrderRepository orderRepository;
-
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final String secretKey = "f7nqe02GS/G4kQzTHDUQVwTYoVaXq00hpDr82bgY";
-    private final String accessKey = "AKIA2THHWIVRS3TOZHEO";
-    private final String region = "us-east-1";
-    private final AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
-    private final AmazonSimpleEmailService client = AmazonSimpleEmailServiceClientBuilder
-            .standard().withCredentials(new AWSStaticCredentialsProvider(credentials)).withRegion(region).build();
 
     public final String from = "crumbsFoodService@gmail.com";
+    final String secretKey = System.getenv("AWS_SECRET_ACCESS_KEY");
+    final String accessKey = System.getenv("AWS_ACCESS_KEY_ID");
+    private final AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+    private final AmazonSimpleEmailService client = AmazonSimpleEmailServiceClientBuilder
+            .standard().withCredentials(new AWSStaticCredentialsProvider(credentials)).withRegion("us-east-1").build();
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     public EmailService(
@@ -55,13 +53,6 @@ public class EmailService {
         this.userStatusRepository = userStatusRepository;
         this.orderRepository = orderRepository;
     }
-
-
-    //    When on group EC2 instance -> configure environment variables:
-//    private final String accessKey = ${ACCESS_KEY};
-//    private final String secretKey = ${SECRET_KEY};
-//    private final String region = ${REGION};
-//    public final String from = ${CRUMBS_EMAIL};
 
     public void sendConfirmationEmail(EmailDTO emailDTO) {
 

@@ -20,12 +20,10 @@ import java.util.List;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-    @Value("${jwt.secret}")
-    private String jwtSecret;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.addFilter(new JwtAuthorizationFilter(authenticationManager(), jwtSecret))
+        http.addFilter(new JwtAuthorizationFilter(authenticationManager(), System.getenv("JWT_SECRET")))
                 .authorizeRequests()
                 .antMatchers( "/actuator/**", "/email-service/confirmation/**").permitAll()
                 .anyRequest().authenticated()
