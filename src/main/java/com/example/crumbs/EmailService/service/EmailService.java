@@ -66,7 +66,7 @@ public class EmailService {
         String emailConfirmationTemplate = "EmailConfirmationTemplate";
         templatedEmailRequest.withTemplate(emailConfirmationTemplate);
 
-        String link = "http://localhost:3000/email/verification/" + emailDTO.getToken();
+        String link = "http://crumbs-client.s3-website-us-east-1.amazonaws.com/email/verification/" + emailDTO.getToken();
 
         String templateData = "{ \"name\":\"" + emailDTO.getName() + "\", \"link\": \""+ link + "\"}";
 
@@ -86,7 +86,7 @@ public class EmailService {
         String passwordRecoveryTemplate = "passwordRecoveryTemplate";
         templatedEmailRequest.withTemplate(passwordRecoveryTemplate);
 
-        String link = "http://localhost:3000/passwordRecovery/" + emailDTO.getToken();
+        String link = "http://crumbs-client.s3-website-us-east-1.amazonaws.com/passwordRecovery/" + emailDTO.getToken();
 
         String templateData = "{\"link\": \""+ link + "\"}";
 
