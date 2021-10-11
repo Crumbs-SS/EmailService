@@ -17,8 +17,10 @@ import com.crumbs.lib.repository.UserStatusRepository;
 import com.example.crumbs.EmailService.dto.EmailDTO;
 import com.example.crumbs.EmailService.mapper.TemplateData;
 import com.example.crumbs.EmailService.mapper.TemplateDataMapper;
+import com.example.crumbs.EmailService.util.ApiUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +31,7 @@ import java.util.NoSuchElementException;
 
 @Service
 @Transactional(rollbackFor = { Exception.class })
+@Slf4j
 public class EmailService {
 
     private final ConfirmationTokenRepository confirmationTokenRepository;
@@ -66,7 +69,7 @@ public class EmailService {
         String emailConfirmationTemplate = "EmailConfirmationTemplate";
         templatedEmailRequest.withTemplate(emailConfirmationTemplate);
 
-        String link = "http://localhost:3000/email/verification/" + emailDTO.getToken();
+        String link = ApiUtil.getClientURL() + "/email/verification/" + emailDTO.getToken();
 
         String templateData = "{ \"name\":\"" + emailDTO.getName() + "\", \"link\": \""+ link + "\"}";
 
@@ -86,7 +89,7 @@ public class EmailService {
         String passwordRecoveryTemplate = "passwordRecoveryTemplate";
         templatedEmailRequest.withTemplate(passwordRecoveryTemplate);
 
-        String link = "http://localhost:3000/passwordRecovery/" + emailDTO.getToken();
+        String link = ApiUtil.getClientURL() + "/passwordRecovery/" + emailDTO.getToken();
 
         String templateData = "{\"link\": \""+ link + "\"}";
 
@@ -100,13 +103,18 @@ public class EmailService {
         UserDetails customer = order.getCustomer().getUserDetails();
         String email = customer.getEmail();
         TemplateData templateData = TemplateDataMapper.orderToTemplateData(order);
+
         Destination destination = new Destination(List.of(email));
         SendTemplatedEmailRequest templatedEmailRequest = new SendTemplatedEmailRequest();
         templatedEmailRequest.withDestination(destination);
         templatedEmailRequest.withTemplate("OrderDetailsTemplate");
+
         try {
             templatedEmailRequest.withTemplateData(objectMapper.writeValueAsString(templateData));
-        } catch (JsonProcessingException ignored) {}
+        } catch (JsonProcessingException exception) {
+            log.error(exception.getMessage());
+        }
+
         templatedEmailRequest.withSource(from);
         client.sendTemplatedEmail(templatedEmailRequest);
     }
