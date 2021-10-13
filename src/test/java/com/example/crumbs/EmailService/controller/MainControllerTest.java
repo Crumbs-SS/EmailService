@@ -1,8 +1,9 @@
 package com.example.crumbs.EmailService.controller;
 
-import com.example.crumbs.EmailService.Controller.MainController;
 import com.example.crumbs.EmailService.MockUtil;
-import com.example.crumbs.EmailService.Service.EmailService;
+import com.example.crumbs.EmailService.service.EmailService;
+import com.example.crumbs.EmailService.service.SNSService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,29 +23,48 @@ public class MainControllerTest {
     private MockMvc mockMvc;
     @MockBean
     private EmailService emailService;
+    @MockBean
+    private SNSService snsService;
+    @Autowired
+    ObjectMapper objectMapper;
 
     @Test
     public void confirmToken() throws Exception{
-
-        mockMvc.perform(get("/email/token/{token}", MockUtil.getToken())
+        mockMvc.perform(put("/email-service/confirmation/token/{token}", MockUtil.getToken())
                 .contentType("application/json"))
                 .andExpect(status().isOk());
-
     }
     @Test
     public void sendConfirmationEmail() throws Exception{
-
-        mockMvc.perform(get("/email/{email}/name/{name}/token/{token}", MockUtil.getEmail(), MockUtil.getName(), MockUtil.getToken())
-        .contentType("application/json"))
+        mockMvc.perform(post("/email-service/confirmation/{username}", "mockUsername")
+                .content(objectMapper.writeValueAsString(MockUtil.getEmailDTO()))
+                .contentType("application/json"))
                 .andExpect(status().isOk());
-
+    }
+    @Test
+    public void sendPasswordRecoveryEmail() throws Exception {
+        mockMvc.perform(post("/email-service/password/{username}", "correctUsername")
+                .header("Authorization", ("Bearer " + MockUtil.createMockJWT("CUSTOMER")))
+                .content(objectMapper.writeValueAsString(MockUtil.getEmailDTO()))
+                .contentType("application/json"))
+                .andExpect(status().isOk());
     }
 
 
     @Test
     public void sendOrderDetails() throws Exception {
-        mockMvc.perform(post("/email/orders/{id}/details", -1)
-        .contentType("application/json"))
+        mockMvc.perform(post("/email-service/orders/{id}/details", -1)
+                .header("Authorization", ("Bearer " + MockUtil.createMockJWT("CUSTOMER")))
+                .header("Username" , "correctUsername")
+                .contentType("application/json"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void sendOrderRequestToDriver() throws Exception {
+        mockMvc.perform(post("/email-service/orders/{orderId}/drivers/{driverId}", -1, 1l)
+                .header("Authorization", ("Bearer " + MockUtil.createMockJWT("ADMIN")))
+                .contentType("application/json"))
                 .andExpect(status().isNoContent());
     }
 }

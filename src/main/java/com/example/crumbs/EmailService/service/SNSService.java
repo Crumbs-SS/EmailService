@@ -1,4 +1,4 @@
-package com.example.crumbs.EmailService.Service;
+package com.example.crumbs.EmailService.service;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -11,11 +11,11 @@ import com.crumbs.lib.entity.Order;
 import com.crumbs.lib.repository.DriverRepository;
 import com.crumbs.lib.repository.OrderRepository;
 import com.example.crumbs.EmailService.mapper.TemplateDataMapper;
+import com.example.crumbs.EmailService.util.ApiUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.NumberFormat;
-import java.util.HashMap;
 import java.util.Locale;
 
 @Service
@@ -27,8 +27,8 @@ public class SNSService {
     private final AmazonSNS snsClient;
 
     {
-        final String secretKey = "A5msrtaTiM/TOhZPJMf0JDLP0Dw5UcVlUrBZ23e9";
-        final String accessKey = "AKIA2THHWIVRZSIFDHIE";
+        final String secretKey = System.getenv("AWS_SECRET_ACCESS_KEY");
+        final String accessKey = System.getenv("AWS_ACCESS_KEY_ID");
         final BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
         final AWSStaticCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(credentials);
         snsClient = AmazonSNSClientBuilder
@@ -49,8 +49,8 @@ public class SNSService {
         String message = "Order#: " + order.getId() + "\n" + """
         Please visit the link to view your order or make changes:
        
-        http://localhost:3000/profile
-        """;
+       
+        """ + ApiUtil.getClientURL() + "/profile";
         snsClient.publish(new PublishRequest()
                 .withMessage("Your order has been placed!\n" + message)
                 .withPhoneNumber("+1"+order.getPhone()));
@@ -73,7 +73,8 @@ public class SNSService {
                 "Estimated pay is: " + dollarFormat.format(order.getDeliveryPay()) + "\n" +
                 "Estimated delivery slot is at " + order.getDeliverySlot() + "\n" +
                 "To accept this order click the link below: \n" +
-                "http://localhost:3000/orders/"+orderId+"/drivers/"+driverId;
+                ApiUtil.getClientURL() + "/orders/"+orderId+"/drivers/"+driverId;
+
 
         snsClient.publish(new PublishRequest()
                 .withMessage(message)

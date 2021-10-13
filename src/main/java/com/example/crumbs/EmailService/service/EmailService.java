@@ -1,4 +1,4 @@
-package com.example.crumbs.EmailService.Service;
+package com.example.crumbs.EmailService.service;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
@@ -17,8 +17,10 @@ import com.crumbs.lib.repository.UserStatusRepository;
 import com.example.crumbs.EmailService.dto.EmailDTO;
 import com.example.crumbs.EmailService.mapper.TemplateData;
 import com.example.crumbs.EmailService.mapper.TemplateDataMapper;
+import com.example.crumbs.EmailService.util.ApiUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,21 +31,20 @@ import java.util.NoSuchElementException;
 
 @Service
 @Transactional(rollbackFor = { Exception.class })
+@Slf4j
 public class EmailService {
 
     private final ConfirmationTokenRepository confirmationTokenRepository;
     private final UserStatusRepository userStatusRepository;
     private final OrderRepository orderRepository;
-
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final String secretKey = "A5msrtaTiM/TOhZPJMf0JDLP0Dw5UcVlUrBZ23e9";
-    private final String accessKey = "AKIA2THHWIVRZSIFDHIE";
-    private final String region = "us-east-1";
-    private final AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
-    private final AmazonSimpleEmailService client = AmazonSimpleEmailServiceClientBuilder
-            .standard().withCredentials(new AWSStaticCredentialsProvider(credentials)).withRegion(region).build();
 
     public final String from = "crumbsFoodService@gmail.com";
+    final String secretKey = System.getenv("AWS_SECRET_ACCESS_KEY");
+    final String accessKey = System.getenv("AWS_ACCESS_KEY_ID");
+    private final AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+    private final AmazonSimpleEmailService client = AmazonSimpleEmailServiceClientBuilder
+            .standard().withCredentials(new AWSStaticCredentialsProvider(credentials)).withRegion("us-east-1").build();
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     public EmailService(
@@ -55,13 +56,6 @@ public class EmailService {
         this.userStatusRepository = userStatusRepository;
         this.orderRepository = orderRepository;
     }
-
-
-    //    When on group EC2 instance -> configure environment variables:
-//    private final String accessKey = ${ACCESS_KEY};
-//    private final String secretKey = ${SECRET_KEY};
-//    private final String region = ${REGION};
-//    public final String from = ${CRUMBS_EMAIL};
 
     public void sendConfirmationEmail(EmailDTO emailDTO) {
 
@@ -75,7 +69,7 @@ public class EmailService {
         String emailConfirmationTemplate = "EmailConfirmationTemplate";
         templatedEmailRequest.withTemplate(emailConfirmationTemplate);
 
-        String link = "http://localhost:3000/email/verification/" + emailDTO.getToken();
+        String link = ApiUtil.getClientURL() + "/email/verification/" + emailDTO.getToken();
 
         String templateData = "{ \"name\":\"" + emailDTO.getName() + "\", \"link\": \""+ link + "\"}";
 
@@ -95,7 +89,7 @@ public class EmailService {
         String passwordRecoveryTemplate = "passwordRecoveryTemplate";
         templatedEmailRequest.withTemplate(passwordRecoveryTemplate);
 
-        String link = "http://localhost:3000/passwordRecovery/" + emailDTO.getToken();
+        String link = ApiUtil.getClientURL() + "/passwordRecovery/" + emailDTO.getToken();
 
         String templateData = "{\"link\": \""+ link + "\"}";
 
@@ -109,13 +103,18 @@ public class EmailService {
         UserDetails customer = order.getCustomer().getUserDetails();
         String email = customer.getEmail();
         TemplateData templateData = TemplateDataMapper.orderToTemplateData(order);
+
         Destination destination = new Destination(List.of(email));
         SendTemplatedEmailRequest templatedEmailRequest = new SendTemplatedEmailRequest();
         templatedEmailRequest.withDestination(destination);
         templatedEmailRequest.withTemplate("OrderDetailsTemplate");
+
         try {
             templatedEmailRequest.withTemplateData(objectMapper.writeValueAsString(templateData));
-        } catch (JsonProcessingException ignored) {}
+        } catch (JsonProcessingException exception) {
+            log.error(exception.getMessage());
+        }
+
         templatedEmailRequest.withSource(from);
         client.sendTemplatedEmail(templatedEmailRequest);
     }
