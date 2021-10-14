@@ -38,13 +38,12 @@ public class EmailService {
     private final UserStatusRepository userStatusRepository;
     private final OrderRepository orderRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    public final String from = "crumbsFoodService@gmail.com";
-    final String secretKey = System.getenv("AWS_SECRET_ACCESS_KEY");
-    final String accessKey = System.getenv("AWS_ACCESS_KEY_ID");
+    private final String from = "crumbsFoodService@gmail.com";
+    private final String secretKey = System.getenv("AWS_SECRET_ACCESS_KEY");
+    private final String accessKey = System.getenv("AWS_ACCESS_KEY_ID");
     private final AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
-    private final AmazonSimpleEmailService client = AmazonSimpleEmailServiceClientBuilder
-            .standard().withCredentials(new AWSStaticCredentialsProvider(credentials)).withRegion("us-east-1").build();
+    private final AmazonSimpleEmailService client = AmazonSimpleEmailServiceClientBuilder.standard()
+            .withCredentials(new AWSStaticCredentialsProvider(credentials)).withRegion("us-east-1").build();
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     public EmailService(
@@ -138,7 +137,7 @@ public class EmailService {
 
         UserDetails user = confirmationToken.getUserDetails();
 
-        UserStatus status = userStatusRepository.findById("REGISTERED").get();
+        UserStatus status = userStatusRepository.findById("REGISTERED").orElse(null);
 
         if(user.getOwner() != null)
             user.getOwner().setUserStatus(status);

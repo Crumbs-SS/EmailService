@@ -13,15 +13,12 @@ class EmailServiceTest {
     @Autowired EmailService emailService;
 
     @Test
-    void sendConfirmationEmail() {
-    }
-
-    @Test
     void sendOrderDetails() {
         assertThrows(NoSuchElementException.class, () -> emailService.sendOrderDetails(-1L));
     }
 
     @Test
     void confirmToken() {
+
     }
 }

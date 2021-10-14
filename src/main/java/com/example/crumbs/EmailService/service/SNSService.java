@@ -24,19 +24,14 @@ public class SNSService {
 
     private final OrderRepository orderRepository;
     private final DriverRepository driverRepository;
-    private final AmazonSNS snsClient;
-
-    {
-        final String secretKey = System.getenv("AWS_SECRET_ACCESS_KEY");
-        final String accessKey = System.getenv("AWS_ACCESS_KEY_ID");
-        final BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
-        final AWSStaticCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(credentials);
-        snsClient = AmazonSNSClientBuilder
+    private final String secretKey = System.getenv("AWS_SECRET_ACCESS_KEY");
+    private final String accessKey = System.getenv("AWS_ACCESS_KEY_ID");
+    private final BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+    private final AWSStaticCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(credentials);
+    private final AmazonSNS snsClient = AmazonSNSClientBuilder
                 .standard()
                 .withCredentials(credentialsProvider)
                 .withRegion(Regions.US_EAST_1).build();
-    }
-
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     SNSService(OrderRepository orderRepository, DriverRepository driverRepository){
@@ -74,7 +69,6 @@ public class SNSService {
                 "Estimated delivery slot is at " + order.getDeliverySlot() + "\n" +
                 "To accept this order click the link below: \n" +
                 ApiUtil.getClientURL() + "/orders/"+orderId+"/drivers/"+driverId;
-
 
         snsClient.publish(new PublishRequest()
                 .withMessage(message)

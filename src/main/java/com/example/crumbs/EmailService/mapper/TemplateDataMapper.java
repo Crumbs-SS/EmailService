@@ -13,6 +13,10 @@ import java.util.Locale;
 
 public class TemplateDataMapper {
 
+    private TemplateDataMapper(){
+        throw new IllegalStateException("Utility class");
+    }
+
     public static TemplateData orderToTemplateData(Order order){
         return TemplateData.builder()
                 .orderId(order.getId())
