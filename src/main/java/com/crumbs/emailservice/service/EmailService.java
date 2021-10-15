@@ -14,12 +14,14 @@ import com.crumbs.lib.entity.Order;
 import com.crumbs.lib.entity.UserDetails;
 import com.crumbs.lib.entity.UserStatus;
 import com.crumbs.lib.repository.ConfirmationTokenRepository;
+import com.crumbs.lib.repository.DriverStateRepository;
 import com.crumbs.lib.repository.OrderRepository;
 import com.crumbs.lib.repository.UserStatusRepository;
 import com.crumbs.emailservice.dto.EmailDTO;
 import com.crumbs.emailservice.mapper.TemplateDataMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,26 +33,17 @@ import java.util.NoSuchElementException;
 @Service
 @Transactional(rollbackFor = { Exception.class })
 @Slf4j
+@RequiredArgsConstructor
 public class EmailService {
 
     private final ConfirmationTokenRepository confirmationTokenRepository;
+    private final DriverStateRepository driverStateRepository;
     private final UserStatusRepository userStatusRepository;
     private final OrderRepository orderRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final AWSCredentials credentials = new BasicAWSCredentials(ApiUtil.getAWS_ACCESS_KEY_ID(), ApiUtil.getAWS_SECRET_ACCESS_KEY());
     private final AmazonSimpleEmailService client = AmazonSimpleEmailServiceClientBuilder.standard()
             .withCredentials(new AWSStaticCredentialsProvider(credentials)).withRegion("us-east-1").build();
-
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-    public EmailService(
-            ConfirmationTokenRepository confirmationTokenRepository,
-            UserStatusRepository userStatusRepository,
-            OrderRepository orderRepository
-            ){
-        this.confirmationTokenRepository =  confirmationTokenRepository;
-        this.userStatusRepository = userStatusRepository;
-        this.orderRepository = orderRepository;
-    }
 
     public void sendConfirmationEmail(EmailDTO emailDTO) {
 
@@ -141,8 +134,10 @@ public class EmailService {
             user.getAdmin().setUserStatus(status);
         if(user.getCustomer() != null)
             user.getCustomer().setUserStatus(status);
-        if(user.getDriver() != null)
+        if(user.getDriver() != null){
             user.getDriver().setUserStatus(status);
+            user.getDriver().setState(driverStateRepository.getById("CHECKED_OUT"));
+        }
 
         return "Your email has successfully been confirmed. You can now login to Crumbs Food Service and start ordering delicious food!";
     }
