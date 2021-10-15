@@ -24,7 +24,7 @@ public class SNSService {
 
     private final OrderRepository orderRepository;
     private final DriverRepository driverRepository;
-    private final BasicAWSCredentials credentials = new BasicAWSCredentials(ApiUtil.getAccessKey(), ApiUtil.getSecretKey());
+    private final BasicAWSCredentials credentials = new BasicAWSCredentials(ApiUtil.getAWS_ACCESS_KEY_ID(), ApiUtil.getAWS_SECRET_ACCESS_KEY());
     private final AWSStaticCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(credentials);
     private final AmazonSNS snsClient = AmazonSNSClientBuilder
                 .standard()
@@ -43,7 +43,7 @@ public class SNSService {
         Please visit the link to view your order or make changes:
        
        
-        """ + ApiUtil.getClientURL() + "/profile";
+        """ + ApiUtil.getCLIENT_URL() + "/profile";
         snsClient.publish(new PublishRequest()
                 .withMessage("Your order has been placed!\n" + message)
                 .withPhoneNumber("+1"+order.getPhone()));
@@ -66,7 +66,7 @@ public class SNSService {
                 "Estimated pay is: " + dollarFormat.format(order.getDeliveryPay()) + "\n" +
                 "Estimated delivery slot is at " + order.getDeliverySlot() + "\n" +
                 "To accept this order click the link below: \n" +
-                ApiUtil.getClientURL() + "/orders/"+orderId+"/drivers/"+driverId;
+                ApiUtil.getCLIENT_URL() + "/orders/"+orderId+"/drivers/"+driverId;
 
         snsClient.publish(new PublishRequest()
                 .withMessage(message)

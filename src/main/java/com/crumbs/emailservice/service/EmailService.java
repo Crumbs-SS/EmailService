@@ -37,7 +37,7 @@ public class EmailService {
     private final UserStatusRepository userStatusRepository;
     private final OrderRepository orderRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    private final AWSCredentials credentials = new BasicAWSCredentials(ApiUtil.getAccessKey(), ApiUtil.getSecretKey());
+    private final AWSCredentials credentials = new BasicAWSCredentials(ApiUtil.getAWS_ACCESS_KEY_ID(), ApiUtil.getAWS_SECRET_ACCESS_KEY());
     private final AmazonSimpleEmailService client = AmazonSimpleEmailServiceClientBuilder.standard()
             .withCredentials(new AWSStaticCredentialsProvider(credentials)).withRegion("us-east-1").build();
 
@@ -64,12 +64,12 @@ public class EmailService {
         String emailConfirmationTemplate = "EmailConfirmationTemplate";
         templatedEmailRequest.withTemplate(emailConfirmationTemplate);
 
-        String link = ApiUtil.getClientURL() + "/email/verification/" + emailDTO.getToken();
+        String link = ApiUtil.getCLIENT_URL() + "/email/verification/" + emailDTO.getToken();
 
         String templateData = "{ \"name\":\"" + emailDTO.getName() + "\", \"link\": \""+ link + "\"}";
 
         templatedEmailRequest.withTemplateData(templateData);
-        templatedEmailRequest.withSource(ApiUtil.getFrom());
+        templatedEmailRequest.withSource(ApiUtil.getFROM());
         client.sendTemplatedEmail(templatedEmailRequest);
     }
 
@@ -84,12 +84,12 @@ public class EmailService {
         String passwordRecoveryTemplate = "passwordRecoveryTemplate";
         templatedEmailRequest.withTemplate(passwordRecoveryTemplate);
 
-        String link = ApiUtil.getClientURL() + "/passwordRecovery/" + emailDTO.getToken();
+        String link = ApiUtil.getCLIENT_URL() + "/passwordRecovery/" + emailDTO.getToken();
 
         String templateData = "{\"link\": \""+ link + "\"}";
 
         templatedEmailRequest.withTemplateData(templateData);
-        templatedEmailRequest.withSource(ApiUtil.getFrom());
+        templatedEmailRequest.withSource(ApiUtil.getFROM());
         client.sendTemplatedEmail(templatedEmailRequest);
     }
 
@@ -110,7 +110,7 @@ public class EmailService {
             log.error(exception.getMessage());
         }
 
-        templatedEmailRequest.withSource(ApiUtil.getFrom());
+        templatedEmailRequest.withSource(ApiUtil.getFROM());
         client.sendTemplatedEmail(templatedEmailRequest);
     }
 

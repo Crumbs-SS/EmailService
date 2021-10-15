@@ -3,7 +3,11 @@ package com.crumbs.emailservice;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.crumbs.emailservice.dto.EmailDTO;
+import com.crumbs.lib.entity.ConfirmationToken;
+
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.Optional;
 
 public class MockUtil {
 
@@ -19,6 +23,14 @@ public class MockUtil {
 
     public static EmailDTO getEmailDTO(){
         return EmailDTO.builder().email("mock@a.com").name("mockUsername").token("mockTocken").build();
+    }
+    public static ConfirmationToken getConfirmationToken(){
+        return ConfirmationToken.builder()
+                .token("token")
+                .createdAt(LocalDateTime.now())
+                .id(1l)
+                .expiresAt(LocalDateTime.now().plusMinutes(15))
+                .build();
     }
 
     public  static String createMockJWT(String role){
