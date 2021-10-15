@@ -1,8 +1,7 @@
-package com.example.crumbs.EmailService;
+package com.crumbs.emailservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.core.SpringVersion;
 
 @SpringBootApplication
 public class EmailServiceApplication {

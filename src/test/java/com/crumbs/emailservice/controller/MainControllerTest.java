@@ -1,8 +1,8 @@
-package com.example.crumbs.EmailService.controller;
+package com.crumbs.emailservice.controller;
 
-import com.example.crumbs.EmailService.MockUtil;
-import com.example.crumbs.EmailService.service.EmailService;
-import com.example.crumbs.EmailService.service.SNSService;
+import com.crumbs.emailservice.MockUtil;
+import com.crumbs.emailservice.service.EmailService;
+import com.crumbs.emailservice.service.SNSService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;

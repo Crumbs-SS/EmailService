@@ -1,4 +1,4 @@
-package com.example.crumbs.EmailService.service;
+package com.crumbs.emailservice.service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package com.example.crumbs.EmailService.service;
+package com.crumbs.emailservice.service;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -6,12 +6,12 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sns.AmazonSNS;
 import com.amazonaws.services.sns.AmazonSNSClientBuilder;
 import com.amazonaws.services.sns.model.PublishRequest;
+import com.crumbs.emailservice.util.ApiUtil;
 import com.crumbs.lib.entity.Driver;
 import com.crumbs.lib.entity.Order;
 import com.crumbs.lib.repository.DriverRepository;
 import com.crumbs.lib.repository.OrderRepository;
-import com.example.crumbs.EmailService.mapper.TemplateDataMapper;
-import com.example.crumbs.EmailService.util.ApiUtil;
+import com.crumbs.emailservice.mapper.TemplateDataMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,9 +24,7 @@ public class SNSService {
 
     private final OrderRepository orderRepository;
     private final DriverRepository driverRepository;
-    private final String secretKey = System.getenv("AWS_SECRET_ACCESS_KEY");
-    private final String accessKey = System.getenv("AWS_ACCESS_KEY_ID");
-    private final BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
+    private final BasicAWSCredentials credentials = new BasicAWSCredentials(ApiUtil.getAccessKey(), ApiUtil.getSecretKey());
     private final AWSStaticCredentialsProvider credentialsProvider = new AWSStaticCredentialsProvider(credentials);
     private final AmazonSNS snsClient = AmazonSNSClientBuilder
                 .standard()

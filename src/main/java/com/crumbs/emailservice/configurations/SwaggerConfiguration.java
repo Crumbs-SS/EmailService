@@ -1,4 +1,4 @@
-package com.example.crumbs.EmailService.configurations;
+package com.crumbs.emailservice.configurations;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

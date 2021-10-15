@@ -1,4 +1,4 @@
-package com.example.crumbs.EmailService.mapper;
+package com.crumbs.emailservice.mapper;
 
 import com.crumbs.lib.entity.FoodOrder;
 import com.crumbs.lib.entity.Location;

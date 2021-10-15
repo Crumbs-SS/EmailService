@@ -1,8 +1,8 @@
-package com.example.crumbs.EmailService;
+package com.crumbs.emailservice;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.example.crumbs.EmailService.dto.EmailDTO;
+import com.crumbs.emailservice.dto.EmailDTO;
 import java.util.Date;
 
 public class MockUtil {

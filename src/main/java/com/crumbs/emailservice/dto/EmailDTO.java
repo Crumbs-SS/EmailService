@@ -1,4 +1,4 @@
-package com.example.crumbs.EmailService.dto;
+package com.crumbs.emailservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

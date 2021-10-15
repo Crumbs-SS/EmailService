@@ -1,4 +1,4 @@
-package com.example.crumbs.EmailService.mapper;
+package com.crumbs.emailservice.mapper;
 
 import lombok.Builder;
 import lombok.Data;

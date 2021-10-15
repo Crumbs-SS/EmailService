@@ -1,4 +1,4 @@
-package com.example.crumbs.EmailService.exceptionHelper;
+package com.crumbs.emailservice.exceptionHelper;
 
 
 import org.springframework.http.HttpStatus;

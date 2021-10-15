@@ -1,8 +1,8 @@
-package com.example.crumbs.EmailService.controller;
+package com.crumbs.emailservice.controller;
 
-import com.example.crumbs.EmailService.service.EmailService;
-import com.example.crumbs.EmailService.service.SNSService;
-import com.example.crumbs.EmailService.dto.EmailDTO;
+import com.crumbs.emailservice.service.EmailService;
+import com.crumbs.emailservice.service.SNSService;
+import com.crumbs.emailservice.dto.EmailDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
